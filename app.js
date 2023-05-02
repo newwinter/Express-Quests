@@ -5,10 +5,12 @@ const express = require("express");
 
 const app = express();
 
+app.use(express.json());
+
 // const port = 5000;
 
 const welcome = (req, res) => {
-  res.send("Welcome to my favourite movie list");
+  res.send("Welcome to my favorite movie list");
 };
 
 app.get("/", welcome);
@@ -17,6 +19,12 @@ const movieHandlers = require("./movieHandlers");
 
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
+app.post("/api/movies", movieHandlers.postMovie);
+
+const users = require("./users");
+app.get("/api/users", users.getUsers);
+app.get("/api/users/:id", users.getUsersById);
+app.post("/api/users", users.postUser);
 
 app.listen(port, (err) => {
   if (err) {
@@ -25,17 +33,3 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
-
-
-const users = require("./users");
-app.get("/api/users", users.getUsers);
-app.get("/api/users/:id", users.getUsersById);
-
-// app.get("/api/users/:id", (req, res) => {
-//   const question = questions.find((quest) => quest.id === +req.params.id);
-//   if (question) {
-//     res.status(200).json(question);
-//   } else {
-//     res.status(404).send("Not Found");
-//   }
-// });
