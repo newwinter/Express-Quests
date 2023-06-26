@@ -16,21 +16,30 @@ const welcome = (req, res) => {
 app.get("/", welcome);
 
 const movieHandlers = require("./movieHandlers");
+const { hashPassword, verifyPassword, verifyToken } = require("./auth.js");
 
 app.get("/api/movies", movieHandlers.getMovies);
 app.get("/api/movies/:id", movieHandlers.getMovieById);
-app.post("/api/movies", movieHandlers.postMovie);
+
+app.use(verifyToken);
 app.put("/api/movies/:id", movieHandlers.updateMovie);
 app.delete("/api/movies/:id", movieHandlers.deleteMovie);
+app.post("/api/movies", movieHandlers.postMovie);
 
 const users = require("./users");
-const { hashPassword } = require("./auth.js");
-app.post("/api/users", hashPassword, users.postUser);
-app.put("/api/users/:id", hashPassword, users.updateUsers);
+
 app.get("/api/users", users.getUsers);
 app.get("/api/users/:id", users.getUsersById);
-// app.post("/api/users", users.postUser);
-// app.put("/api/users/:id", users.updateUsers);
+
+app.post(
+  "/api/login",
+  users.getUserByEmailWithPasswordAndPassToNext,
+  verifyPassword
+);
+
+app.use(verifyToken);
+app.post("/api/users", hashPassword, users.postUser);
+app.put("/api/users/:id", hashPassword, users.updateUsers);
 app.delete("/api/users/:id", users.deleteUsers);
 
 app.listen(port, (err) => {
@@ -40,4 +49,3 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
-
